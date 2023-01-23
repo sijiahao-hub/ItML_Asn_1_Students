@@ -3,6 +3,7 @@ import numpy as np
 import math
 import sklearn.datasets
 import ipywidgets as widgets
+from scipy import stats
 
 ##Seaborn for fancy plots. 
 #%matplotlib inline
@@ -125,16 +126,36 @@ class edaDF:
             figure.show()
         return figure
 
+    def basicStats(self):
+        return self.data.describe()
+
+    def outliers(self):
+        threshold = 3
+        columns= self.data.select_dtypes(include=["int", "float"]).columns
+        for col in columns:
+            z = np.abs(stats.zscore(self.data[col]))
+            outliers = np.where(z>threshold)
+            print(outliers)
+
+    def boxplot(self):
+        self.data.boxplot(grid=False, rot= 45, fontsize = 15)
+
+
     def fullEDA(self):
         out1 = widgets.Output()
         out2 = widgets.Output()
         out3 = widgets.Output()
         out4 = widgets.Output()
+        out5 = widgets.Output()
+        out6 = widgets.Output()
 
         tab = widgets.Tab(children = [out1, out2, out3])
         tab.set_title(0, 'Info')
         tab.set_title(1, 'Categorical')
         tab.set_title(2, 'Numerical')
+        tab.set_title(3, 'Basic Stats')
+        tab.set_title(4,'Outliers')
+        tab.set_title(5,'Boxplot')
         display(tab)
 
         with out1:
@@ -147,3 +168,13 @@ class edaDF:
         with out3:
             fig3 = self.histPlots(kde=True, show=False)
             plt.show(fig3)
+
+        with out4:
+            print(self.basicStats)
+
+        with out5:
+            print(self.outliers)
+
+        with out6:
+            fig4 = self.boxplot()
+            plt.show(fig4)
